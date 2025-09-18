@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: part1-basic-jimmer-core
+  profiles:
+    active: dev

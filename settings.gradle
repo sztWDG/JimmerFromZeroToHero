@@ -1,0 +1,5 @@
+rootProject.name = 'JimmerFromZeroToHero'
+
+include('part1-basic-jimmer-core')
+include('part2-jimmer-sql')
+include('part3-advance-starter')

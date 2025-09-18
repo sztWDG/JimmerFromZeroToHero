@@ -1,0 +1,35 @@
+# gradle/libs.versions.toml
+[versions]
+# 插件版本
+spring-boot = "3.5.5"
+spring-dependency-management = "1.1.7"
+
+# 依赖版本
+# Lombok
+lombok = "1.18.34"
+# postgreSQL
+postgresql = "42.7.7"  # 使用当前最新版本，或者你需要的版本
+# jimmer
+jimmer = "0.9.109"
+# 测试
+junit-platform-launcher = "1.10.2"
+
+[libraries]
+# Spring Boot Starters
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "spring-boot" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "spring-boot" }
+# Lombok
+lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
+# postgreSQL
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql"}
+# jimmer
+jimmer-spring-boot-starter = { module = "org.babyfish.jimmer:jimmer-spring-boot-starter", version.ref = "jimmer" }
+jimmer-apt = { module = "org.babyfish.jimmer:jimmer-apt", version.ref = "jimmer" }
+# 测试
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform-launcher" }
+
+[bundles]
+
+
+[plugins]
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }

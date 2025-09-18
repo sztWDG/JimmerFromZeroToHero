@@ -1,0 +1,15 @@
+plugins {
+    id 'org.springframework.boot' version '3.5.5'
+}
+
+
+dependencies {
+    runtimeOnly libs.postgresql
+
+    // Jimmer 核心依赖
+    implementation libs.jimmer.spring.boot.starter
+
+    // 编译时依赖（包括注解处理器）
+    compileOnly libs.jimmer.apt
+    annotationProcessor libs.jimmer.apt
+}
