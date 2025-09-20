@@ -1,3 +1,13 @@
 plugins {
     id 'org.springframework.boot' version '3.5.5'
 }
+
+
+dependencies {
+    implementation libs.jimmer.sql
+    annotationProcessor libs.jimmer.apt
+    implementation libs.postgresql
+
+    implementation libs.slf4j
+    implementation libs.logback
+}

@@ -3,3 +3,9 @@ plugins {
 }
 
 
+dependencies {
+    implementation libs.postgresql
+
+    implementation libs.jimmer.spring.boot.starter
+    annotationProcessor libs.jimmer.apt
+}

@@ -1,0 +1,37 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://43.138.210.244:5432/postgres?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&characterEncoding=utf8
+    username: user_CPKmph
+    password: password_baQimQ
+    driver-class-name: org.postgresql.Driver
+
+server:
+  port: 8080
+
+jimmer:
+  language: java
+  dialect: org.babyfish.jimmer.sql.dialect.PostgresDialect
+  show-sql: true    # Jimmer SQL 日志
+  pretty-sql: true  # 格式化日志
+  inline-sql-variables: true
+  database-validation-mode: ERROR
+
+  client:
+    ts:
+      path: /ts.zip
+    openapi:
+      path: /openapi.yaml
+      ui-path: /openapi.html
+      properties:
+        info:
+          title: App Service
+          description: App Service API
+          version: 1.0
+        components:
+          security-schemes:
+            AuthorizationHeader:
+              type: apiKey
+              in: header
+              name: Authorization
+        securities:
+          - AuthorizationHeader: [ ]

@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: part2-jimmer-sql
+  profiles:
+    active: dev

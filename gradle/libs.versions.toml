@@ -11,6 +11,10 @@ lombok = "1.18.34"
 postgresql = "42.7.7"  # 使用当前最新版本，或者你需要的版本
 # jimmer
 jimmer = "0.9.109"
+# slf4j
+slf4j = "2.0.17"
+# logback
+logback = "1.5.18"
 # 测试
 junit-platform-launcher = "1.10.2"
 
@@ -25,6 +29,11 @@ postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql"}
 # jimmer
 jimmer-spring-boot-starter = { module = "org.babyfish.jimmer:jimmer-spring-boot-starter", version.ref = "jimmer" }
 jimmer-apt = { module = "org.babyfish.jimmer:jimmer-apt", version.ref = "jimmer" }
+jimmer-sql = { module = "org.babyfish.jimmer:jimmer-sql", version.ref = "jimmer"}
+# slf4j
+slf4j = {module = "org.slf4j:slf4j-api", version.ref = "slf4j"}
+# logback
+logback = {module = "ch.qos.logback:logback-classic", version.ref = "logback"}
 # 测试
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform-launcher" }
 

@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: part3-advance-starter
+  profiles:
+    active: dev
