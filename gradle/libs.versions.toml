@@ -10,7 +10,7 @@ lombok = "1.18.34"
 # postgreSQL
 postgresql = "42.7.7"  # 使用当前最新版本，或者你需要的版本
 # jimmer
-jimmer = "0.9.109"
+jimmer = "0.9.100"
 # slf4j
 slf4j = "2.0.17"
 # logback

@@ -1,5 +1,6 @@
 package org.lionhead.advancestarter.entity;
 
+import jakarta.annotation.Nullable;
 import org.babyfish.jimmer.sql.*;
 
 import java.time.LocalDateTime;
@@ -27,8 +28,10 @@ public interface Book {
 
     LocalDateTime modifiedTime();
 
+    @Nullable
     @ManyToOne
-    @JoinColumn(name = "store_id")
+    @JoinColumn(name = "store_id", foreignKeyType = ForeignKeyType.FAKE)
+    @OnDissociate(DissociateAction.DELETE)
     BookStore bookStore();
 
     @ManyToMany
