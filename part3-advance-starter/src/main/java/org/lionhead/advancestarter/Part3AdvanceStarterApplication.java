@@ -2,6 +2,8 @@ package org.lionhead.advancestarter;
 
 import org.babyfish.jimmer.DraftObjects;
 import org.babyfish.jimmer.sql.JSqlClient;
+import org.babyfish.jimmer.sql.ast.Predicate;
+import org.babyfish.jimmer.sql.ast.mutation.AssociatedSaveMode;
 import org.babyfish.jimmer.sql.ast.mutation.DeleteResult;
 import org.babyfish.jimmer.sql.ast.mutation.SaveMode;
 import org.babyfish.jimmer.sql.ast.mutation.SimpleSaveResult;
@@ -30,7 +32,7 @@ public class Part3AdvanceStarterApplication {
     @Bean
     public ApplicationRunner applicationRunner(JSqlClient sqlClient) {
         return args -> {
-            queryFields(sqlClient);
+             complexSave(sqlClient);
         };
     }
 
@@ -99,7 +101,7 @@ public class Part3AdvanceStarterApplication {
                         .setGender("M")
                         .setCreatedTime(LocalDateTime.now())
                         .setModifiedTime(LocalDateTime.now())
-        );
+                );
         // INSERT_ONLY: 直接生成 INSERT 语句
         logger.info("SaveMode.INSERT_ONLY =======================");
         // 简写形式
@@ -138,14 +140,14 @@ public class Part3AdvanceStarterApplication {
                 .execute();
         int id3 = upsertResult.getModifiedEntity().id();
         // 第二次 UPSERT, 此时数据已存在，会生成 UPDATE；
-        sqlClient.save(author1,SaveMode.UPSERT);
+        sqlClient.save(author1, SaveMode.UPSERT);
 
         // 手动 unload 掉两个 Key 属性
         Author authorWithoutIdAndKey = AuthorDraft.$
                 .produce(author1, draft -> {
                     DraftObjects.unload(draft, AuthorProps.FIRST_NAME);
                     DraftObjects.unload(draft, AuthorProps.LAST_NAME);
-        });
+                });
         try {
             // 保存一个既没有 id 属性也没有 key 属性的对象时， UPSERT 模式认为该类对象是非法的，将会抛出异常
             sqlClient.save(authorWithoutIdAndKey, SaveMode.UPSERT);
@@ -203,7 +205,7 @@ public class Part3AdvanceStarterApplication {
                 // eq(NULL) --> isNull() --> is null
                 .whereIf(website == null, booStoreTable.website().eq(website))
                 // ne(NULL) --> isNotNull() --> is not null
-                .whereIf(website==null, booStoreTable.website().ne(website))
+                .whereIf(website == null, booStoreTable.website().ne(website))
                 .select(booStoreTable)
                 .execute();
         // 3. 在 Java 当中，对方法传参是立即求值的，所以 whereIf 两个参数都会立即执行
@@ -278,7 +280,7 @@ public class Part3AdvanceStarterApplication {
 
     }
 
-    private void fetcher(JSqlClient sqlClient){
+    private void fetcher(JSqlClient sqlClient) {
         AuthorTable table = AuthorTable.$;
         sqlClient.createQuery(table)
                 .where(table.id().eq(1))
@@ -321,16 +323,106 @@ public class Part3AdvanceStarterApplication {
                                 .gender(false)
                 )).fetchOne();
 
-        // 混用 tuple 元组和独享抓取器
-        sqlClient.createQuery(table)
-                .where(table.id().eq(1))
-                .select(
-                        table.id(),
-                        table.fetch(
-                        // allScalarFields 所有属性，包含关联属性
-                        AuthorFetcher.$
-                                .allTableFields()
-                                .gender(false)
-                )).fetchOne();
+
     }
+
+    private void andOrNot(JSqlClient sqlClient) {
+        AuthorTable table = AuthorTable.$;
+        // 逻辑与 and
+        // 方式一： 链式 where
+        sqlClient.createQuery(table)
+                .where(table.firstName().eq("John"))
+                .where(table.lastName().eq("Willian"))
+                .select(table)
+                .execute();
+        // 方式二： 在一个 where 里面写多个调节
+        sqlClient.createQuery(table)
+                .where(
+                        table.firstName().eq("John"),
+                        table.lastName().eq("Willian")
+                )
+                .select(table)
+                .execute();
+
+        // 逻辑或 or
+        sqlClient.createQuery(table)
+                .where(
+                        Predicate.or(
+                                table.firstName().eq("John"),
+                                table.lastName().eq("Willian")
+                        )
+                )
+                .select(table)
+                .execute();
+
+        // 逻辑非 not
+        sqlClient.createQuery(table)
+                .where(Predicate.not(table.firstName().eq("John")))
+                // .where(table.firstName().ne("John")) 一般这样更好
+                .select(table)
+                .execute();
+
+    }
+
+    // 多表保存
+    private void complexSave(JSqlClient sqlClient) {
+        // CREATE
+        // 保存 BookStore 的同同，也保存 BookStore 关联的 Book
+        // 方式一：从 BookStore 开始
+        BookStore bookStore1 = BookStoreDraft.$
+                .produce(draft -> draft
+                        .setName("book store 3")
+                        .addIntoBooks(bookDraft -> bookDraft
+                                .setName("jimmer from zero to hero")
+                                .setEdition(1)
+                                .setPrice(100.0)
+                                .setTenant("a")
+                        )
+                        .addIntoBooks(bookDraft -> bookDraft
+                                .setName("jimmer from zero to hero")
+                                .setEdition(2)
+                                .setPrice(99.0)
+                                .setTenant("a")
+                        )
+                );
+         // sqlClient.save(bookStore1, SaveMode.UPSERT);
+         // 下面是完整版
+        sqlClient.getEntities()
+                .saveCommand(bookStore1)
+                .setMode(SaveMode.UPSERT)
+                // 可以单独设置也可以统一设置
+                // .setAssociatedMode(BookStoreProps.BOOKS, AssociatedSaveMode.REPLACE)
+                .setAssociatedModeAll(AssociatedSaveMode.REPLACE)
+                .execute();
+
+        // 方式二：从 Book 方向
+        Book book1 = BookDraft.$
+                .produce(draft -> draft
+                        .setName("jimmer from zero to hero")
+                        .setEdition(3)
+                        .setPrice(100.0)
+                        .setTenant("a")
+                        .applyBookStore(bookStoreDraft -> bookStoreDraft
+                                .setName("book Store 4"))
+                );
+        Book book2 = BookDraft.$
+                .produce(draft -> draft
+                        .setName("jimmer from zero to hero")
+                        .setEdition(4)
+                        .setPrice(100.0)
+                        .setTenant("a")
+                        .applyBookStore(bookStoreDraft -> bookStoreDraft
+                                .setName("book store 4")
+                        )
+                );
+        List<Book> bookList = List.of(book1, book2);
+        // sqlClient.saveEntities(bookList, SaveMode.INSERT_IF_ABSENT);
+        sqlClient.getEntities()
+                .saveEntitiesCommand(bookList)
+                .setMode(SaveMode.UPSERT)
+                .setAssociatedModeAll(AssociatedSaveMode.REPLACE)
+                .execute();
+
+    }
+
 }

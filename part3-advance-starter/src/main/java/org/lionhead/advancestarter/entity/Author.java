@@ -3,6 +3,7 @@ package org.lionhead.advancestarter.entity;
 import org.babyfish.jimmer.sql.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public interface Author {
@@ -24,4 +25,7 @@ public interface Author {
     LocalDateTime createdTime();
 
     LocalDateTime modifiedTime();
+
+    @ManyToMany(mappedBy = "authors")
+    List<Book> books();
 }

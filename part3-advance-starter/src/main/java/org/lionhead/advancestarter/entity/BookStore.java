@@ -1,24 +1,28 @@
-package org.lionhead.advancestarter.entity;
+    package org.lionhead.advancestarter.entity;
 
-import jakarta.annotation.Nullable;
-import org.babyfish.jimmer.sql.*;
+    import jakarta.annotation.Nullable;
+    import org.babyfish.jimmer.sql.*;
 
-import java.time.LocalDateTime;
+    import java.time.LocalDateTime;
+    import java.util.List;
 
-@Entity
-public interface BookStore {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id();
+    @Entity
+    public interface BookStore {
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        int id();
 
-    @Key
-    String name();
+        @Key
+        String name();
 
-    @Nullable
-    String website();
+        @Nullable
+        String website();
 
-    LocalDateTime createdTime();
+        LocalDateTime createdTime();
 
-    LocalDateTime modifiedTime();
+        LocalDateTime modifiedTime();
 
-}
+        @OneToMany(mappedBy = "bookStore")
+        List<Book> books();
+
+    }
